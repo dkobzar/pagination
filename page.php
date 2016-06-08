@@ -54,7 +54,7 @@ if (($db = fopen("word.db", "r")) !== false) {
     echo "</table>";
     fclose($db);
 }
-echo '<a href="?page=' . ($pageNumber - 1) . '">Назад >></a>';
+echo '<a href="?page=' . ($pageNumber - 1) . '"><< Назад</a>';
 for ($i = 1; $i <= $pageCount; $i++){
     echo '<a href="?page=' . $i . '">' . $i . '</a> ';
 }
