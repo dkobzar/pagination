@@ -37,25 +37,42 @@ while (!feof($db)) {
 fclose($db);
 
 //получаем количество страниц, которое должно быть сформировано
-$maxRows = 20; //количество строк, которые нам необходимо вывести
-$pageCount = ceil($stringCount / $maxRows);
+$maxRows = 20; //количество строк, которые нам необходимо вывести на экран
+$pageCount = ceil($stringCount / $maxRows); //количество страниц, которое будет сформировано
+
+//определяем номер текущей страницы
 $pageNumber = empty($_GET['page']) || intval($_GET['page']) < 1 ? 1 : intval($_GET['page']);
+/*если в массиве GET значение с ключом page пустое ИЛИ если это значение меньше 1
+в переменную $pageNumber запишется 1. или в нее запишется значение page, переданное через массив $_GET*/
+
+//определяем НОМЕР строки, с которой нам нужно будет начать вывод
 $firstRow = $maxRows * ($pageNumber - 1);
+
+//определяем НОМЕР сроки, на которой нам нужно закончить вывод
 $lastRow = $maxRows + $firstRow;
-$counter = 0;
-if (($db = fopen("word.db", "r")) !== false) {
-    echo "<table>";
-    while (($words = fgetcsv($db, 1000, ",")) !== false) {
-        if ($firstRow <= $counter && $counter < $lastRow) {
+
+//организуем вывод строк из файла
+$counter = 0; //счетчик для цикла
+if (($db = fopen("word.db", "r")) !== false) { //если файл word.db успешно открылся, т.е. не вернул false выводим
+    echo '<table>';
+    while (($words = fgetcsv($db, 1000, ",")) !== false) { //цикл. условие - пока в массив $words добавляются элементы (строки)
+        if ($firstRow <= $counter && $counter < $lastRow) {/*условие для вывода в цикле. вывод строк идет если счетчик
+            больше/равно НОМЕРА первой строки для вывода и меньше НОМЕРА последней строки для вывода*/
             echo "<tr>" . "<td>" . $words[0] . "</td>" . "<td>" . $words[1] . "</td>" . "</tr>";
         }
-        $counter++;
+        $counter++; //наращиваем счетчик для следующей итерации
     }
-    echo "</table>";
+    echo '</table>';
     fclose($db);
 }
-echo '<a href="?page=' . ($pageNumber - 1) . '"><< Назад</a>';
-for ($i = 1; $i <= $pageCount; $i++){
+
+//вывод ссылок для навигации
+if (($pageNumber - 1) > 0) {
+    echo '<a href="?page=' . ($pageNumber - 1) . '"><< Назад</a>';
+}
+for ($i = 1; $i <= $pageCount; $i++) {
     echo '<a href="?page=' . $i . '">' . $i . '</a> ';
 }
-echo '<a href="?page=' . ($pageNumber + 1) . '">Вперед >></a>';
+if ($pageNumber < $pageCount) {
+    echo '<a href="?page=' . ($pageNumber + 1) . '">Вперед >></a>';
+}
